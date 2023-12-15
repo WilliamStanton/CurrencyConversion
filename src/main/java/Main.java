@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
@@ -25,12 +26,14 @@ public class Main {
     public static Currencies currencyAPI = new Currencies();
     public static ImageIcon icon = new ImageIcon("icon.png");
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         try {
             UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLightLaf");
         } catch (Exception ex) {
             System.err.println("Failed to initialize LaF");
         }
+        
+//        currencyAPI.getRate("USD");
         
         // Initialize Currencies
         String[] currencies = {
@@ -83,7 +86,7 @@ public class Main {
                 // Display results
                 JOptionPane.showMessageDialog(convert, new DecimalFormat("#.00").format(Double.parseDouble(baseCurrencyTextbox.getText())) + " " + currencies[baseCurrencyDropdown.getSelectedIndex()] + " is " + new DecimalFormat("#.00").format(results) + " " + currencies[targetCurrencyDropdown.getSelectedIndex()], "Currency Conversion Application", 0, icon);
             }
-            catch(HeadlessException | NumberFormatException e) {
+            catch(HeadlessException | IOException | NumberFormatException e) {
                 JOptionPane.showMessageDialog(convert, "Invalid Input \n" + e.toString(), "Currency Conversion Application", 0, icon);
             }
         };

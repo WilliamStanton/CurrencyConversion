@@ -1,3 +1,15 @@
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * The Currencies class provides various methods for conversion of currencies
  * 
@@ -7,53 +19,35 @@
  */
 public class Currencies {
     
-    /**
-     * The getUSDRate method returns the usd rate for the specified currency
-     * @param baseCurrency the currency selected
-     * @return the usd rate for the currency selected, or 0.00 if currency not found
-     */
-    public double getUSDRate(String baseCurrency) {
-        // initialize usd rate
-        double rate = 0.00;
+    public double getConversion(double baseAmount, String baseCurrency, String targetCurrency) throws MalformedURLException, IOException {
+        // GET request
+        URL url = new URL("https://v6.exchangerate-api.com/v6/306aa222cfd43e8ff567e5f3/pair/" + baseCurrency + "/" + targetCurrency + "/" + baseAmount);
+        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+        request.connect();
+        System.out.println(request.toString());
         
-        // find usd rate
-        switch(baseCurrency) {
-            case "USD" -> rate = 1.00;
-            case "EUR" -> rate = 1.08;
-            case "JPY" -> rate = 0.0069;
-            case "GBP" -> rate = 1.25;
-            case "AUD" -> rate = 0.66;
-            case "CAD" -> rate = 0.74;
-            case "CNY" -> rate = 0.14;
-            case "CNH" -> rate = 7.1898;
-            case "HKD" -> rate = 0.13;
-            case "NZD" -> rate = 0.61;
-            default -> rate = 0.00;
-        }
+        // Parse JSON Response
+        JsonParser jp = new JsonParser();
+        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
+        JsonObject jsonobj = root.getAsJsonObject();
         
-        // return usd rate
-        return rate;
+        System.out.println(jsonobj.getAsJsonObject());
+        
+        return jsonobj.get("conversion_result").getAsDouble();
     }
     
-    /**
-     * The getConversion method takes the base amount and base currency and converts it to the target currency
-     * @param baseAmount the base amount of money
-     * @param baseCurrency the base currency
-     * @param targetCurrency the target currency to convert the base to
-     * @return the amount of money equivalent to the base amount, in the target currency
-     */
-    public double getConversion(double baseAmount, String baseCurrency, String targetCurrency) {
-        // Get the usd rate of the base currency
-        double usdRate = getUSDRate(baseCurrency);
-        
-        // Convert the base amount in base currency to usd amount
-        double usdAmount = baseAmount * usdRate;
-        
-        // Get the usd rate of the target currency
-        double targetRate = getUSDRate(targetCurrency);
-        
-        // Convert the base amount (in usd) to the target currency amount
-        return usdAmount / targetRate;
-        
-    }
+//    public void getRate(String currency) throws MalformedURLException, IOException {
+//        // GET request
+//        URL url = new URL("https://v6.exchangerate-api.com/v6/306aa222cfd43e8ff567e5f3/latest/" + currency);
+//        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+//        request.connect();
+//        System.out.println(request.toString());
+//
+//        // Parse JSON Response
+//        JsonParser jp = new JsonParser();
+//        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
+//        JsonObject jsonobj = root.getAsJsonObject();
+//
+//        System.out.println(jsonobj.get("conversion_rates").getAsJsonObject().get("EUR"));
+//    }
 }
