@@ -8,6 +8,7 @@
  */
 
 import java.awt.Font;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -73,13 +74,18 @@ public class Main {
         JButton convert = new JButton("Convert Currencies");
         ActionListener goConvert = (ActionEvent ae) -> {
             // Get results
-            double results = currencyAPI.getConversion(Double.parseDouble(
-                  baseCurrencyTextbox.getText()),                           // base currency
-                    currencies[baseCurrencyDropdown.getSelectedIndex()],      // base currency amount
-                    currencies[targetCurrencyDropdown.getSelectedIndex()]);   // target currency
-            
-            // Display results
-            JOptionPane.showMessageDialog(convert, new DecimalFormat("#.00").format(Double.parseDouble(baseCurrencyTextbox.getText())) + " " + currencies[baseCurrencyDropdown.getSelectedIndex()] + " is " + new DecimalFormat("#.00").format(results) + " " + currencies[targetCurrencyDropdown.getSelectedIndex()], "Currency Conversion Application", 0, icon);
+            try {
+                double results = currencyAPI.getConversion(Double.parseDouble(
+                        baseCurrencyTextbox.getText()), // base currency
+                        currencies[baseCurrencyDropdown.getSelectedIndex()], // base currency amount
+                        currencies[targetCurrencyDropdown.getSelectedIndex()]);   // target currency
+
+                // Display results
+                JOptionPane.showMessageDialog(convert, new DecimalFormat("#.00").format(Double.parseDouble(baseCurrencyTextbox.getText())) + " " + currencies[baseCurrencyDropdown.getSelectedIndex()] + " is " + new DecimalFormat("#.00").format(results) + " " + currencies[targetCurrencyDropdown.getSelectedIndex()], "Currency Conversion Application", 0, icon);
+            }
+            catch(HeadlessException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(convert, "Invalid Input \n" + e.toString(), "Currency Conversion Application", 0, icon);
+            }
         };
         convert.addActionListener(goConvert);
         
